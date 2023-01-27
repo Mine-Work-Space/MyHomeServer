@@ -1,0 +1,79 @@
+﻿@page "/signIn"
+@using Blazored.LocalStorage
+@using Client.Providers
+@using MyHomeServer.Client.Static
+
+<h3>Авторизація</h3>
+
+@if(_signInSuccessful == false)
+{
+    <hr/>
+    <div class="form-group my-3">
+        <h2>Можеш використати дефолтні дані:</h2>
+        <h5>UserName</h5>
+        <h5>user@example.com</h5>
+        <h5>Password1!</h5>
+    </div>
+    <hr/>
+    <h3></h3>
+ <EditForm Model="_userToSignIn" OnValidSubmit="SignInUser">
+    <DataAnnotationsValidator/>
+    <div class="form-group my-3">
+        <label for="username">Логін:</label>
+        <InputText @bind-Value="_userToSignIn.UserName" id="username" class="form-control" />
+        <ValidationMessage For="@(() => _userToSignIn.UserName)"/>
+    </div>
+    <div class="form-group my-3">
+        <label for="email">Email:</label>
+        <InputText @bind-Value="_userToSignIn.EmailAdress" id="email" class="form-control" />
+        <ValidationMessage For="@(() => _userToSignIn.EmailAdress)" />
+    </div>
+    <div class="form-group my-3">
+        <label for="password">Пароль:</label>
+        <InputText @bind-Value="_userToSignIn.Password" id="password" class="form-control" />
+        <ValidationMessage For="@(() => _userToSignIn.Password)" />
+    </div>
+    <ValidationSummary />
+
+    <button type="submit" class="btn btn-primary btn-lg">Увійти</button>
+    @if(_attemptToSignInFailed == true)
+    {
+        <p class="my-3 text-danger">Упс... введені дані невірні!</p>
+    }
+    </EditForm>
+}
+else
+{
+    <h4>Авторизація успішна! Вітаємо на моєму сервері. Натисни кнопку нижче щоб продовжити</h4>
+    <a href="/fetchdata" class="btn btn-primary btn-lg">Fetch data</a>
+}
+
+@code {
+    [Inject] HttpClient HttpClient { get; set; }
+    [Inject] ILocalStorageService LocalStorageService { get; set; }
+    [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+
+    private User _userToSignIn = new User();
+    private bool _signInSuccessful = false;
+    private bool _attemptToSignInFailed = false;
+
+    private async Task SignInUser()
+    {
+        _attemptToSignInFailed = false;
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync(APIEndpoints.s_signIn, _userToSignIn);
+        if(httpResponseMessage.IsSuccessStatusCode)
+        {
+            string jsonWebToken = await httpResponseMessage.Content.ReadAsStringAsync();
+            await LocalStorageService.SetItemAsync("bearerToken", jsonWebToken);
+            await ((AppAuthenticationStateProvider)AuthenticationStateProvider).SignIn();
+
+            HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", jsonWebToken);
+            _signInSuccessful = true;
+        }
+        else
+        {
+            _attemptToSignInFailed = true;
+        }
+    }
+}

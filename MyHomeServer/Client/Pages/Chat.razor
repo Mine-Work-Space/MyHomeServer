@@ -1,0 +1,87 @@
+﻿@page "/chat"
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+
+<PageTitle>SignalR Chat</PageTitle>
+<h3>SignalR Chat</h3>
+@if (!IsAuthenticated)
+{
+    <p><em>Ви не авторизовані щоб почати користуватись чатом.</em></p>
+    <a href="/signin" class="btn btn-primary btn-lg">Увійти</a>
+}
+else
+{
+    <textarea style="width:100%; height:100%; min-height: 300px">
+        @messages
+        </textarea>
+    <div class="input-group">
+        @if(!IsConnected)
+        {
+            <button class="btn btn-primary from-control-append" @onclick="Connect">Підключитись</button>
+        }
+        else
+        {   
+            <input @bind-value="message"
+               @bind-value:event="oninput"
+               @onkeyup="HandleInput"
+                   class="form-control" />
+            <button class="btn btn-primary form-group-append" @onclick="Send" disabled="@(!IsConnected)">
+                <span class="oi oi-caret-right" aria-hidden="true"></span>
+            </button>
+        }
+    </div>
+}
+@code {
+    private HubConnection? hubConnection;
+    private bool IsAuthenticated = false;
+    private string messages = string.Empty;
+    private string username = string.Empty;
+    private string message = string.Empty;
+    [CascadingParameter] protected Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationState).User;
+        if (user.Identity.IsAuthenticated == true)
+        {
+            IsAuthenticated = true;
+            username = user.Identity.Name;
+        }
+    }
+    private async Task Connect()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri($"/chathub?username={username}"))
+            .Build();
+        hubConnection.On<string, string>("GetMessage", (user, message) =>
+        {
+            var msg = $"{(string.IsNullOrEmpty(user) ? "" : user + ": ")} {message}";
+            messages += msg + "\n";
+            StateHasChanged();
+        });
+        await hubConnection.StartAsync();
+    }
+    private async Task Send()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.SendAsync("AddMessageToChat", username, message);
+            message = string.Empty;
+        }
+    }
+    public async Task HandleInput(KeyboardEventArgs args)
+    {
+        if (args.Key.Equals("Enter"))
+        {
+            await Send();
+        }
+    }
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
