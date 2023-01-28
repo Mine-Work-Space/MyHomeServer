@@ -7,6 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\Video\**" />
+    <Content Remove="wwwroot\Video\**" />
+    <EmbeddedResource Remove="wwwroot\Video\**" />
+    <None Remove="wwwroot\Video\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="compilerconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="compilerconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
     <PackageReference Include="Blazored.Video" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.2" />
@@ -19,10 +34,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\MyHomeServer.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\Video\" />
   </ItemGroup>
 
 </Project>
