@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Shared.Models
+namespace MyHomeServer.Shared.Models
 {
     public class User
     {
