@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MyHomeServer.Server.Data.DbModels;
 using MyHomeServer.Shared.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -13,34 +14,25 @@ namespace MyHomeServer.Server.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
-        public UserController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public UserController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _configuration = configuration;
         }
-        /*
-        [Route("getUserName")]
-        [HttpGet]
-        public async Task<string> GetUserName([FromRoute]string email)
-        {
-            IdentityUser user = await _userManager.FindByEmailAsync(email);
-            return user.UserName;
-        }
-        */
         [Route("register")]
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] User user)
+        public async Task<IActionResult> Register([FromBody] UserDTO user)
         {
             string userName = user.UserName;
             string password = user.Password;
             string email = user.EmailAdress;
 
-            IdentityUser identityUser = new IdentityUser()
+            ApplicationUser identityUser = new ApplicationUser()
             {
                 UserName = userName,
                 Email = email
@@ -66,7 +58,7 @@ namespace MyHomeServer.Server.Controllers
         [Route("signin")]
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> SignIn([FromBody] User user)
+        public async Task<IActionResult> SignIn([FromBody] UserDTO user)
         {
             string userName = user.UserName;
             string password = user.Password;
@@ -75,7 +67,7 @@ namespace MyHomeServer.Server.Controllers
 
             if (signInResult.Succeeded == true)
             {
-                IdentityUser identityUser = await _userManager.FindByNameAsync(userName);
+                ApplicationUser identityUser = await _userManager.FindByNameAsync(userName);
                 string JsonWebTokensAsString = await GenerateJSONWebToken(identityUser);
                 return Ok(JsonWebTokensAsString);
             }
@@ -86,7 +78,7 @@ namespace MyHomeServer.Server.Controllers
         }
         [NonAction]
         [ApiExplorerSettings(IgnoreApi = true)]
-        private async Task<string> GenerateJSONWebToken(IdentityUser identityUser)
+        private async Task<string> GenerateJSONWebToken(ApplicationUser identityUser)
         {
             SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             SigningCredentials credentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);

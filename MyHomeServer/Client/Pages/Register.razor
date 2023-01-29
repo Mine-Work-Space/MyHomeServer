@@ -38,7 +38,7 @@ else
 
 @code {
     [Inject] HttpClient HttpClient { get; set; }
-    private User _userToRegister = new User() { UserName = "UserName", EmailAdress = "user@example.com", Password = "Password1!" };
+    private UserDTO _userToRegister = new UserDTO() { UserName = "UserName", EmailAdress = "user@example.com", Password = "Password1!" };
     private bool _registerSuccessful = false;
     private bool _attemptToRegisterFailed = false;
     private string? _attemptToRegisterFailedErrorMessage = String.Empty;
