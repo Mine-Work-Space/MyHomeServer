@@ -17,7 +17,7 @@ body {
 }
 
 .people-list {
-    width: 30%;
+    width: 260px;
     float: left;
 }
 
@@ -67,7 +67,7 @@ body {
     }
 
 .chat {
-    width: 70%;
+    width: 490px;
     float: left;
     background: #F2F5F8;
     border-top-right-radius: 5px;

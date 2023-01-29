@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using MyHomeServer.Shared.Models;
 
 namespace MyHomeServer.Server.Hubs
 {
@@ -10,17 +11,26 @@ namespace MyHomeServer.Server.Hubs
         {
             string username = Context.GetHttpContext().Request.Query["username"];
             Users.Add(Context.ConnectionId, username);
-            await AddMessageToChat(username, " під'єднався!");
+            await AddMessageToChat(new MessageDTO() { 
+                SenderUser = username,
+                Content = "під'єднався!",
+                SendDate = DateTime.Now
+            });
             await base.OnConnectedAsync();
         }
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             string username = Users.FirstOrDefault(u => u.Key == Context.ConnectionId).Value;
-            await AddMessageToChat(username, "вийшов");
+            await AddMessageToChat(new MessageDTO()
+            {
+                SenderUser = username,
+                Content = "вийшов.",
+                SendDate = DateTime.Now
+            });
         }
-        public async Task AddMessageToChat(string user, string message)
+        public async Task AddMessageToChat(MessageDTO message)
         {
-            await Clients.All.SendAsync("GetMessage", user, message);
+            await Clients.All.SendAsync("GetMessage", message);
         }
     }
 }
