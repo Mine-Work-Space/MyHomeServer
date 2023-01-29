@@ -23,6 +23,17 @@ namespace MyHomeServer.Server.Controllers
             _userManager = userManager;
             _configuration = configuration;
         }
+        [Route("get-users")]
+        [HttpGet]
+        public async Task<List<UserDTO>> GetUsersAsync()
+        {
+            List<UserDTO> users = new List<UserDTO>();
+            foreach (var user in _userManager.Users.ToList())
+            {
+                users.Add(new UserDTO() { EmailAdress = user.Email, UserName = user.UserName });
+            }
+            return users;
+        }
         [Route("register")]
         [AllowAnonymous]
         [HttpPost]

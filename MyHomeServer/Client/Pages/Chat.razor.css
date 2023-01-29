@@ -15,9 +15,12 @@ body {
     background: #444753;
     border-radius: 5px;
 }
-
+.user-photo {
+    width:55px;
+    height:55px;
+}
 .people-list {
-    width: 260px;
+    width: 30%;
     float: left;
 }
 
@@ -25,15 +28,6 @@ body {
         padding: 20px;
     }
 
-    .people-list input {
-        border-radius: 3px;
-        border: none;
-        padding: 14px;
-        color: white;
-        background: #6A6C75;
-        width: 90%;
-        font-size: 14px;
-    }
 
     .people-list .fa-search {
         position: relative;
@@ -67,7 +61,7 @@ body {
     }
 
 .chat {
-    width: 490px;
+    width: 70%;
     float: left;
     background: #F2F5F8;
     border-top-right-radius: 5px;
@@ -114,7 +108,7 @@ body {
     }
 
         .chat .chat-history .message-data {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .chat .chat-history .message-data-time {
@@ -124,11 +118,11 @@ body {
 
         .chat .chat-history .message {
             color: white;
-            padding: 18px 20px;
+            padding: 10px 10px;
             line-height: 26px;
             font-size: 16px;
             border-radius: 7px;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             width: 90%;
             position: relative;
         }

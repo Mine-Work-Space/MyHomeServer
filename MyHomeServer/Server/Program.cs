@@ -74,6 +74,15 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+// For updating css or javascript
+app.UseStaticFiles(new StaticFileOptions()
+{
+    OnPrepareResponse = context =>
+    {
+        context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+        context.Context.Response.Headers.Add("Expires", "-1");
+    }
+});
 
 app.UseHttpsRedirection();
 
