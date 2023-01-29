@@ -1,9 +1,9 @@
 ﻿@page "/chat"
+@using System.Security.Claims;
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 
 <PageTitle>SignalR Chat</PageTitle>
-<h3>SignalR Chat</h3>
 @if (!IsAuthenticated)
 {
     <p><em>Ви не авторизовані щоб почати користуватись чатом.</em></p>
@@ -11,41 +11,199 @@
 }
 else
 {
-    <textarea style="width:100%; height:100%; min-height: 300px">
-        @messages
-        </textarea>
-    <div class="input-group">
-        @if(!IsConnected)
-        {
-            <button class="btn btn-primary from-control-append" @onclick="Connect">Підключитись</button>
-        }
-        else
-        {   
-            <input @bind-value="message"
-               @bind-value:event="oninput"
-               @onkeyup="HandleInput"
-                   class="form-control" />
-            <button class="btn btn-primary form-group-append" @onclick="Send" disabled="@(!IsConnected)">
-                <span class="oi oi-caret-right" aria-hidden="true"></span>
-            </button>
-        }
+  <div class="clearfix">
+    <div class="people-list" id="people-list">
+      <div class="search">
+        <input type="text" placeholder="search" />
+        <i class="fa fa-search"></i>
+      </div>
+      <ul class="list">
+        <li class="clearfix">
+          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg" alt="avatar" />
+          <div class="about">
+            <div class="name">Vincent Porter</div>
+            <div class="status">
+              <i class="fa fa-circle online"></i> online
+            </div>
+          </div>
+        </li>
+        
+        <li class="clearfix">
+          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_02.jpg" alt="avatar" />
+          <div class="about">
+            <div class="name">Aiden Chavez</div>
+            <div class="status">
+              <i class="fa fa-circle offline"></i> left 7 mins ago
+            </div>
+          </div>
+        </li>
+        
+        <li class="clearfix">
+          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_03.jpg" alt="avatar" />
+          <div class="about">
+            <div class="name">Mike Thomas</div>
+            <div class="status">
+              <i class="fa fa-circle online"></i> online
+            </div>
+          </div>
+        </li>
+        
+        <li class="clearfix">
+          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_04.jpg" alt="avatar" />
+          <div class="about">
+            <div class="name">Erica Hughes</div>
+            <div class="status">
+              <i class="fa fa-circle online"></i> online
+            </div>
+          </div>
+        </li>
+        
+        <li class="clearfix">
+          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_05.jpg" alt="avatar" />
+          <div class="about">
+            <div class="name">Ginger Johnston</div>
+            <div class="status">
+              <i class="fa fa-circle online"></i> online
+            </div>
+          </div>
+        </li>
+        
+        <li class="clearfix">
+          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_06.jpg" alt="avatar" />
+          <div class="about">
+            <div class="name">Tracy Carpenter</div>
+            <div class="status">
+              <i class="fa fa-circle offline"></i> left 30 mins ago
+            </div>
+          </div>
+        </li>
+        
+        <li class="clearfix">
+          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_07.jpg" alt="avatar" />
+          <div class="about">
+            <div class="name">Christian Kelly</div>
+            <div class="status">
+              <i class="fa fa-circle offline"></i> left 10 hours ago
+            </div>
+          </div>
+        </li>
+        
+        <li class="clearfix">
+          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_08.jpg" alt="avatar" />
+          <div class="about">
+            <div class="name">Monica Ward</div>
+            <div class="status">
+              <i class="fa fa-circle online"></i> online
+            </div>
+          </div>
+        </li>
+        
+        <li class="clearfix">
+          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_09.jpg" alt="avatar" />
+          <div class="about">
+            <div class="name">Dean Henry</div>
+            <div class="status">
+              <i class="fa fa-circle offline"></i> offline since Oct 28
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
+    
+    <div class="chat">
+      <div class="chat-header clearfix">
+        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01_green.jpg" alt="avatar" />
+        
+        <div class="chat-about">
+          <div class="chat-with">Chat with Vincent Porter</div>
+          <div class="chat-num-messages">already 1 902 messages</div>
+        </div>
+        <i class="fa fa-star"></i>
+      </div> <!-- end chat-header -->
+      
+      <div class="chat-history">
+        <ul>
+            @foreach (var message in Messages)
+            {
+                if(message.SenderUser == username)
+                {
+                    <!-- for current user -->
+                    <li class="clearfix">
+                        <div class="message-data align-right">
+                            <span class="message-data-time" >@message.SendDate.ToShortDateString()</span> &nbsp; &nbsp;
+                            <span class="message-data-name" >@message.SenderUser</span> <i class="fa fa-circle me"></i>
+              
+                        </div>
+                        <div class="message other-message float-right">
+                            @message.Content
+                        </div>
+                    </li>
+                }
+                else
+                {
+                    <!-- for another client -->
+                    <li>
+                        <div class="message-data">
+                            <span class="message-data-name"><i class="fa fa-circle online"></i> @message.SenderUser</span>
+                            <span class="message-data-time">@message.SendDate</span>
+                        </div>
+                        <div class="message my-message">
+                            @message.Content
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+        
+      </div> <!-- end chat-history -->
+      
+      <div class="chat-message clearfix">
+        <textarea @oninput="HandleOnChange" name="message-to-send" id="message-to-send" placeholder="Напишіть повідомлення тут..."
+        rows="3">@message</textarea>
+
+        <i class="fa fa-file-o"></i>
+        <i class="fa fa-file-image-o"></i>
+        <button @onclick="Send" disabled="@(!IsConnected)">ВІДПРАВИТИ</button>
+      </div> <!-- end chat-message -->
+      
+      
+    </div> <!-- end chat -->
+  </div> <!-- end container -->
 }
+
 @code {
     private HubConnection? hubConnection;
     private bool IsAuthenticated = false;
-    private string messages = string.Empty;
+    private List<MessageDTO> Messages = new List<MessageDTO>();
     private string username = string.Empty;
+
     private string message = string.Empty;
+
     [CascadingParameter] protected Task<AuthenticationState> AuthenticationState { get; set; }
+    [Parameter] public string ChildData { get; set; }
+    [Parameter] public EventCallback<string> ChildDataChanged { get; set; }
+
+    private async Task HandleOnChange(ChangeEventArgs args)
+    {
+        message = args.Value.ToString();
+
+        await ChildDataChanged.InvokeAsync(message);
+    }
+    protected override void OnParametersSet()
+    {
+        message = ChildData;
+
+        base.OnParametersSet();
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        var user = (await AuthenticationState).User;
-        if (user.Identity.IsAuthenticated == true)
+        var currentUser = (await AuthenticationState).User;
+        if (currentUser.Identity.IsAuthenticated == true)
         {
             IsAuthenticated = true;
-            username = user.Identity.Name;
+            username = currentUser.Identity.Name;
+            Connect();
         }
     }
     private async Task Connect()
@@ -53,10 +211,16 @@ else
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri($"/chathub?username={username}"))
             .Build();
-        hubConnection.On<string, string>("GetMessage", (user, message) =>
+        hubConnection.On<MessageDTO>("GetMessage", (message) =>
         {
-            var msg = $"{(string.IsNullOrEmpty(user) ? "" : user + ": ")} {message}";
-            messages += msg + "\n";
+            MessageDTO msg = new MessageDTO()
+            {
+                Content = message.Content,
+                SendDate = message.SendDate,
+                SenderUser = message.SenderUser,
+                ChatId = message.ChatId
+            };
+            Messages.Add(msg);
             StateHasChanged();
         });
         await hubConnection.StartAsync();
@@ -65,7 +229,8 @@ else
     {
         if (hubConnection != null)
         {
-            await hubConnection.SendAsync("AddMessageToChat", username, message);
+            await hubConnection.SendAsync("AddMessageToChat", new MessageDTO()
+            { Content = message, SenderUser = username, SendDate = DateTime.Now });
             message = string.Empty;
         }
     }

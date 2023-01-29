@@ -10,9 +10,9 @@ namespace MyHomeServer.Shared.Models
 {
     public class MessageDTO
     {
-        public string Id { get; set; }
         public string Content { get; set; }
-        public string SenderUserId { get; set; }
+        public string SenderUser { get; set; }
         public string ChatId { get; set; }
+        public DateTime SendDate { get; set; }
     }
 }
