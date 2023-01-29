@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MyHomeServer.Server.Data.DbModels;
 using MyHomeServer.Server.Hubs;
 using Server.Data;
 using System.Text;
@@ -26,7 +27,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDefaultIdentity<IdentityUser>()
+builder.Services.AddDefaultIdentity<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -60,7 +61,7 @@ app.UseResponseCompression();
 if (app.Environment.IsDevelopment())
 {
     //RoleManager<IdentityRole> roleManager = builder.Services.BuildServiceProvider().GetService<RoleManager<IdentityRole>>();
-    //UserManager<IdentityUser> userManager = builder.Services.BuildServiceProvider().GetService<UserManager<IdentityUser>>();
+    //UserManager<ApplicationUser> userManager = builder.Services.BuildServiceProvider().GetService<UserManager<ApplicationUser>>();
     //SeedAdministratorRoleAndUser.Seed(roleManager, userManager);
     //app.UseDeveloperExceptionPage();
     app.UseSwagger();

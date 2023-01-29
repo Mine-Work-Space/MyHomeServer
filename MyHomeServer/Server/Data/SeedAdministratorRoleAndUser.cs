@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using MyHomeServer.Server.Data.DbModels;
 
 namespace Server.Data
 {
     public static class SeedAdministratorRoleAndUser
     {
-        internal async static Task Seed(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        internal async static Task Seed(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             await SeedAdministratorRole(roleManager);
             await SeedAdministratorUser(userManager);
@@ -21,13 +22,13 @@ namespace Server.Data
                 await roleManager.CreateAsync(role);
             }
         }
-        private async static Task SeedAdministratorUser(UserManager<IdentityUser> userManager)
+        private async static Task SeedAdministratorUser(UserManager<ApplicationUser> userManager)
         {
             bool administratorUserExists = await userManager.FindByEmailAsync("admin@example.com") != null;
 
             if(administratorUserExists == false)
             {
-                var administratorUser = new IdentityUser
+                var administratorUser = new ApplicationUser
                 {
                     UserName = "Admin",
                     Email = "admin@example.com"

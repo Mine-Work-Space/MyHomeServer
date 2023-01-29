@@ -2,7 +2,7 @@
 
 namespace MyHomeServer.Shared.Models
 {
-    public class User
+    public class UserDTO
     {
         [Display(Name = "Ім'я")]
         public string? UserName { get; set; }
