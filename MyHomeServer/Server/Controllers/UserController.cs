@@ -25,13 +25,16 @@ namespace MyHomeServer.Server.Controllers
         }
         [Route("get-users")]
         [HttpGet]
-        public async Task<List<UserDTO>> GetUsersAsync()
+        public List<UserDTO> GetUsersAsync()
         {
+            var usersArray = _userManager.Users.ToArray();
             List<UserDTO> users = new List<UserDTO>();
-            foreach (var user in _userManager.Users.ToList())
+            int counter = 0;
+            foreach (var user in usersArray)
             {
                 users.Add(new UserDTO() { EmailAdress = user.Email, UserName = user.UserName });
             }
+            
             return users;
         }
         [Route("register")]

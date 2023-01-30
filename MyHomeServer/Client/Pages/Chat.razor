@@ -22,17 +22,17 @@ else
       </div>
       <ul class="list" style="margin-bottom:0px">
           @foreach (var user in Users)
-                {
-            <li class="clearfix">
-                <img src="/defaultUser.png" class="user-photo" alt="avatar" />
-                <div class="about">
-                    <div class="name">Monica Ward</div>
-                    <div class="status">
-                        <i class="fa fa-circle online"></i> online
+            {
+                <li class="clearfix">
+                    <img src="/defaultUser.png" class="user-photo" alt="avatar" />
+                    <div class="about">
+                        <div class="name">@user.UserName</div>
+                        <div class="status">
+                            <i class="fa fa-circle online"></i> online
+                        </div>
                     </div>
-                </div>
-            </li>   
-                }
+                </li>
+            }
       </ul>
     </div>
     
@@ -105,8 +105,8 @@ else
 @code {
     private HubConnection? hubConnection;
     private bool IsAuthenticated = false;
-    private List<MessageDTO> Messages = new List<MessageDTO>();
-    private List<UserDTO> Users = new List<UserDTO>();
+    private List<MessageDTO>? Messages = new List<MessageDTO>();
+    private List<UserDTO>? Users = new List<UserDTO>();
     private string username = string.Empty;
 
     private string message = string.Empty;
@@ -118,22 +118,16 @@ else
         message = args.Value.ToString();
         await ChildDataChanged.InvokeAsync(message);
     }
+
     protected override async Task OnInitializedAsync()
     {
         var currentUser = (await AuthenticationState).User;
         if (currentUser.Identity.IsAuthenticated == true)
         {
             // All okey and User is Authenticated
-            var users = _httpClient.GetFromJsonAsync<List<UserDTO>>(APIEndpoints.s_getUsers);
-            if(users.IsCompleted)
-            {
-                foreach (var user in users.Result)
-                {
-                    Users.Add(new UserDTO() { EmailAdress = user.EmailAdress, UserName = user.UserName });
-                }
-            }
             IsAuthenticated = true;
             username = currentUser.Identity.Name;
+            Users = await _httpClient.GetFromJsonAsync<List<UserDTO>>(APIEndpoints.s_getUsers);
             await Connect();
         }
     }
