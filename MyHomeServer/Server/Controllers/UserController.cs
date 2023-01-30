@@ -23,6 +23,20 @@ namespace MyHomeServer.Server.Controllers
             _userManager = userManager;
             _configuration = configuration;
         }
+        [Route("get-users")]
+        [HttpGet]
+        public List<UserDTO> GetUsersAsync()
+        {
+            var usersArray = _userManager.Users.ToArray();
+            List<UserDTO> users = new List<UserDTO>();
+            int counter = 0;
+            foreach (var user in usersArray)
+            {
+                users.Add(new UserDTO() { EmailAdress = user.Email, UserName = user.UserName });
+            }
+            
+            return users;
+        }
         [Route("register")]
         [AllowAnonymous]
         [HttpPost]
