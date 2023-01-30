@@ -15,11 +15,10 @@ namespace MyHomeServer.Server.Controllers
             {
                 // ** let the hosted path 
                 var filePath = @"D:\Files\" + file.FileName;
-                Console.WriteLine(filePath);
                 if (fragment == 0 && IO.File.Exists(filePath))
                 {
                     IO.File.Delete(filePath);
-                    Console.WriteLine("OOPPSS!");
+                    Console.WriteLine("File already exist!");
                 }
                 using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.None))
                 {
