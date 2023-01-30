@@ -2,6 +2,7 @@
 @inject HttpClient _httpClient
 @using System.Net.Http.Headers
 @using System.IO
+@inject SweetAlertService Swal
 
 <h1>Завантаження великого файлу</h1>
 <hr />
@@ -9,6 +10,9 @@
 {
     <InputFile OnChange="@OnInputFileChange" disabled="@_uploading" />
     <hr />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-@flag" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: @percent%"></div>
+    </div>
 }
 else {
     <h1>Я не знаю хто ти такий.</h1>
@@ -25,6 +29,12 @@ else {
 
     bool _uploading;
     string? echo;
+    private long percent;
+    private string flag;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //var module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/BigFile.razor.js");
+    }
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationState).User;
@@ -40,13 +50,13 @@ else {
         var file = e.File;
         long uploadedBytes = 0;
         long totalBytes = file.Size;
-        long percent = 0;
         int fragment = 0;
         long chunkSize;
 
         using (var inStream = file.OpenReadStream(long.MaxValue))
         {
             _uploading = true;
+            flag = "animated";
             while (_uploading)
             {
                 chunkSize = CHUNKSIZE;
@@ -65,10 +75,14 @@ else {
                 // Update our progress data and UI
                 uploadedBytes += chunkSize;
                 percent = uploadedBytes * 100 / totalBytes;
-                echo = $"Uploaded {percent}%  {uploadedBytes} of {totalBytes} | Fragment: {fragment}";
+                echo = $"Завантажено {percent}%  {uploadedBytes} із {totalBytes} | Фрагмент: {fragment}";
                 if (percent >= 100)
                 {// upload complete
+
                     _uploading = false;
+                    
+                    flag = "";
+                    await Swal.FireAsync("Ура!", "Файл успішно завантажений", "success");
                 }
                 await InvokeAsync(StateHasChanged);
             }
