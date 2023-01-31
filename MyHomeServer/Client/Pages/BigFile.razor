@@ -78,6 +78,7 @@ else {
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
+                        await _httpClient.PatchAsync($"api/File/canceled/{file.Name}", content: null);
                         throw new OperationCanceledException();
                     }
 
@@ -117,6 +118,10 @@ else {
             catch (OperationCanceledException)
             {
                 _uploading = !_uploading;
+            }
+            catch
+            {
+                await Swal.FireAsync("О ні!", "Файл не успішно завантажений", "failed");
             }
             finally
             {
