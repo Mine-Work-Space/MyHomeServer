@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MyHomeServer.Shared.Models;
 using IO = System.IO;
 
 namespace MyHomeServer.Server.Controllers
@@ -8,13 +7,15 @@ namespace MyHomeServer.Server.Controllers
     [ApiController]
     public class FileController : ControllerBase
     {
+        private const string FileStorageFolderPath = @"D:\Files\";
+
         [HttpPost("AppendFile/{fragment}")]
         public async Task<bool> UploadFileChunk(int fragment, IFormFile file)
         {
             try
             {
                 // ** let the hosted path 
-                var filePath = @"D:\Files\" + file.FileName;
+                var filePath = FileStorageFolderPath + file.FileName;
                 if (fragment == 0 && IO.File.Exists(filePath))
                 {
                     IO.File.Delete(filePath);
@@ -35,6 +36,20 @@ namespace MyHomeServer.Server.Controllers
                 Console.WriteLine("Exception: {0}", exception.Message);
             }
             return false;
+        }
+
+        [HttpPatch("canceled/{filename}")]
+        public void CanceledFileUpload(string fileName)
+        {
+            var incompleteFileFullpath = FileStorageFolderPath + fileName;
+
+            if (IO.File.Exists(incompleteFileFullpath))
+            {
+                BadRequest("Failed to notify cancelation!");
+            }
+
+            IO.File.Delete(incompleteFileFullpath);
+            NoContent();
         }
     }
 
