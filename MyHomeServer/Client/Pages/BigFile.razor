@@ -1,7 +1,7 @@
 ﻿@page "/upload-big-file"
 @inject HttpClient _httpClient
-@using System.Net.Http.Headers
 @using System.IO
+@using System.Threading
 @inject SweetAlertService Swal
 
 <h1>Завантаження великого файлу</h1>
@@ -11,8 +11,20 @@
     <InputFile OnChange="@OnInputFileChange" disabled="@_uploading" />
     <hr />
     <div class="progress">
-        <div class="progress-bar progress-bar-striped progress-bar-@flag" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: @percent%"></div>
+        <div class="progress-bar 
+                    progress-bar-striped 
+                    progress-bar-@flag" 
+             role="progressbar" 
+             aria-valuemin="0" 
+             aria-valuemax="100" 
+             style="width: @percent%"></div>
+        @if (_uploading)
+        {
+            <button class="btn btn-warning" @onclick="OnCancelUploading" /> 
+        }
+
     </div>
+   
 }
 else {
     <h1>Я не знаю хто ти такий.</h1>
@@ -53,39 +65,71 @@ else {
         int fragment = 0;
         long chunkSize;
 
+        cancelSource = new CancellationTokenSource();
+        var cancellationToken = cancelSource.Token;
+
         using (var inStream = file.OpenReadStream(long.MaxValue))
         {
             _uploading = true;
             flag = "animated";
-            while (_uploading)
+            try
             {
-                chunkSize = CHUNKSIZE;
-                if (uploadedBytes + CHUNKSIZE > totalBytes)
-                {// remainder
-                    chunkSize = totalBytes - uploadedBytes;
-                }
-                var chunk = new byte[chunkSize];
-                await inStream.ReadAsync(chunk, 0, chunk.Length);
-                // upload this fragment
-                using var formFile = new MultipartFormDataContent();
-                var fileContent = new StreamContent(new MemoryStream(chunk));
-                formFile.Add(fileContent, "file", file.Name);
-                // post
-                var response = await _httpClient.PostAsync($"api/File/AppendFile/{fragment++}", formFile);
-                // Update our progress data and UI
-                uploadedBytes += chunkSize;
-                percent = uploadedBytes * 100 / totalBytes;
-                echo = $"Завантажено {percent}%  {uploadedBytes} із {totalBytes} | Фрагмент: {fragment}";
-                if (percent >= 100)
-                {// upload complete
+                while (_uploading)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException();
+                    }
 
-                    _uploading = false;
-                    
-                    flag = "";
-                    await Swal.FireAsync("Ура!", "Файл успішно завантажений", "success");
+                    chunkSize = CHUNKSIZE;
+                    if (uploadedBytes + CHUNKSIZE > totalBytes)
+                    {// remainder
+                        chunkSize = totalBytes - uploadedBytes;
+                    }
+                    var chunk = new byte[chunkSize];
+                    await inStream.ReadAsync(chunk, 0, chunk.Length, cancellationToken);
+
+                    // upload this fragment
+                    using var formFile = new MultipartFormDataContent();
+                    var fileContent = new StreamContent(new MemoryStream(chunk));
+                    formFile.Add(fileContent, "file", file.Name);
+
+                    // post
+                    var response = await _httpClient.PostAsync($"api/File/AppendFile/{fragment++}", 
+                                                                formFile, 
+                                                                cancellationToken); 
+                    // Update our progress data and UI
+                    uploadedBytes += chunkSize;
+                    percent = uploadedBytes * 100 / totalBytes;
+                    echo = $"Завантажено {percent}%  {uploadedBytes} із {totalBytes} | Фрагмент: {fragment}";
+
+                    if (percent >= 100)
+                    {// upload complete
+
+                        _uploading = false;
+
+                        flag = "";
+                        await Swal.FireAsync("Ура!", "Файл успішно завантажений", "success");
+                    }
+                    await InvokeAsync(StateHasChanged);
                 }
-                await InvokeAsync(StateHasChanged);
+            }
+            catch (OperationCanceledException)
+            {
+                _uploading = !_uploading;
+            }
+            finally
+            {
+                cancelSource.Dispose();
             }
         }
+    }
+
+
+    CancellationTokenSource? cancelSource;
+
+    private void OnCancelUploading()
+    {
+        cancelSource!.Cancel();
     }
 }
