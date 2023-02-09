@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyHomeServer.Shared.Models
+namespace MyHomeServer.ModelsLibrary.Models
 {
     public class GroupDTO
     {

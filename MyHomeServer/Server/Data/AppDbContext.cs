@@ -6,6 +6,7 @@ namespace Server.Data
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
+        public AppDbContext() { }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public virtual DbSet<Group> Groups { get; set; }

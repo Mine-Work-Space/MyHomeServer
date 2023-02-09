@@ -1,0 +1,39 @@
+﻿@page "/videos-gallery"
+@using MyHomeServer.Client.Static
+@inject HttpClient Http
+
+<h3>VideosGallery</h3>
+<PageTitle>Відео</PageTitle>
+
+<BlazoredVideo Play="OnPlay"
+                class="w-100"
+                style="max-width:800px;"
+                controls="controls">
+    <source src="/Video/part1.mp4" type="video/mp4" />
+</BlazoredVideo>
+<BlazoredVideo Play="OnPlay"
+               class="w-100"
+               style="max-width:800px;"
+               controls="controls">
+    <source src="/Video/video1.mp4" type="video/mp4" />
+</BlazoredVideo>
+<BlazoredVideo
+                               class="w-100"
+                               style="max-width:800px;"
+                               controls="controls">
+    <source src="https://www.youtube.com/watch?v=9ytR28QK6I8" type="video/mp4" />
+</BlazoredVideo>
+@code {
+    string[] pathes;
+    protected override async Task OnInitializedAsync()
+    {
+        //string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Video");
+
+       // pathes = Directory.GetFiles(folderPath, "*.mp4");
+    }
+    void OnPlay(VideoState state)
+    {
+        //var url = state.CurrentSrc;
+        // do something with this
+    }
+}

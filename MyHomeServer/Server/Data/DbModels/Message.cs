@@ -15,6 +15,7 @@ namespace MyHomeServer.Server.Data.DbModels
         [StringLength(2048, ErrorMessage = "Повідомлення повинне бути довжиною між {2} та {1}", MinimumLength = 1)]
         [Display(Name = "Повідомлення")]
         public string Content { get; set; } = string.Empty;
+        public bool IsRead { get; set; }
         [ForeignKey("ApplicationUserId")]
         public string ApplicationUserId { get; set; } = string.Empty;
         public virtual ApplicationUser? ApplicationUser { get; set; }

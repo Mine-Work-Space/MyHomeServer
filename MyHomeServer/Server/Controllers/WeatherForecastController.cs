@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MyHomeServer.Shared;
+using MyHomeServer.ModelsLibrary.Models;
 
 namespace MyHomeServer.Server.Controllers
 {
