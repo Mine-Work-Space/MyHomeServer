@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
-using MyHomeServer.Shared.Models;
+using MyHomeServer.ModelsLibrary.Models;
+using Server.Data;
 
 namespace MyHomeServer.Server.Hubs
 {
@@ -28,6 +29,7 @@ namespace MyHomeServer.Server.Hubs
                 SendDate = DateTime.Now
             });
         }
+
         public async Task AddMessageToChat(MessageDTO message)
         {
             await Clients.All.SendAsync("GetMessage", message);

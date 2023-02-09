@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyHomeServer.Shared.Models
+namespace MyHomeServer.ModelsLibrary.Models
 {
     public class UserDTO
     {

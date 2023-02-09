@@ -1,0 +1,11 @@
+﻿@namespace MyHomeServer.Client.Pages.Exception
+@page "/exception/404"
+@inject NavigationManager NavigationManager
+
+<Result Status="404"
+        Title="404"
+        SubTitle="Sorry, the page you visited does not exist.">
+    <Extra>
+        <Button Type="primary" OnClick="@(()=> {NavigationManager.NavigateTo("/");})">Back Home</Button>
+    </Extra>
+</Result>

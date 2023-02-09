@@ -22,13 +22,19 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client\MyHomeServer.Client.csproj" />
-    <ProjectReference Include="..\Shared\MyHomeServer.Shared.csproj" />
+    <ProjectReference Include="..\..\MyHomeServer.Client\MyHomeServer.Client.csproj" />
+    <ProjectReference Include="..\Shared\MyHomeServer.ModelsLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\AppDb.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 
