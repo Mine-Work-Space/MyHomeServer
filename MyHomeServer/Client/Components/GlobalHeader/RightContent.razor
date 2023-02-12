@@ -1,7 +1,10 @@
 ﻿@namespace MyHomeServer.Client.Components
+@using MyHomeServer.Client.Services;
 @inherits AntDomComponentBase
-@inject ProSettings ProSettings
+@inject CustomConfigService ConfigService
 @inject IMessageService Message
+@inject IJSRuntime JSRuntime
+
 <Space Class="@ClassMapper.Class" Size="@("24")">
     <SpaceItem>
         <Switch @bind-Checked="_isChecked" OnClick="ThemeChange">
@@ -38,7 +41,7 @@
     }
 </style>
 
-    @code {
+@code {
     private RenderFragment SunSVG =
     @<svg width="1em" height="1em" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
         <g id="Lager_93" data-name="Lager 93" transform="translate(2 2)">
@@ -103,29 +106,19 @@
         </svg>
     ;
     private bool _isChecked = false;
-    private void ThemeChange()
+    private async Task ThemeChange()
     {
-        // NOT WORKING
-        ProSettings.NavTheme = "dark";
-        ProSettings.Title = "Ого";
-        Message.Success("Dark Theme");
-        StateHasChanged();
-        @*if (_isChecked)
+        if (_isChecked)
         {
-            ProSettings.NavTheme = "dark";
-            ProSettings.Title = "Ого";
+            await ConfigService.SetTheme(CustomGlobalTheme.Dark);
+            await JSRuntime.InvokeVoidAsync("TurnOnDarkTheme");
+            await Message.Success("Ууу, темно");
         }
         else
         {
-            ProSettings.NavTheme = "light";
-            Message.Success("Light Theme");
-            StateHasChanged();
-        }*@
-    }
-    private void DarkTheme()
-    {
-        ProSettings.NavTheme = "dark";
-        ProSettings.Title = "Ого";
-        Message.Success("Dark Theme");
+            await ConfigService.SetTheme(CustomGlobalTheme.Light);
+            await JSRuntime.InvokeVoidAsync("TurnOffDarkTheme");
+            await Message.Success("О, хоч все видно");
+        }
     }
 }

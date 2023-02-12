@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AntDesign;
+using MyHomeServer.Client.Services;
 
 namespace MyHomeServer.Client
 {
@@ -25,7 +27,7 @@ namespace MyHomeServer.Client
                 x.Title = "Home Server";
                 x.NavTheme = "light";
                 x.Layout = "mix";
-                x.PrimaryColor = "daybreak";
+                x.PrimaryColor = "cyan"; // daybreak
                 x.ContentWidth = "Fluid";
                 x.HeaderHeight = 64;
                 x.FixedHeader = true;
@@ -41,8 +43,8 @@ namespace MyHomeServer.Client
             builder.Services.AddScoped<AppAuthenticationStateProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider>(provider
                 => provider.GetRequiredService<AppAuthenticationStateProvider>());
-            builder.Services.AddScoped<ProSettings>();
-            //builder.Services.AddScoped<ConfigP>();
+            //builder.Services.AddScoped<ProSettings>();
+            builder.Services.AddScoped<CustomConfigService>();
             // Cute UI
             builder.Services.AddSweetAlert2();
             await builder.Build().RunAsync();

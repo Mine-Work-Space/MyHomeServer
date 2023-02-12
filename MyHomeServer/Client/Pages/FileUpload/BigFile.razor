@@ -11,6 +11,7 @@
 <hr />
 @if (isAuthenticated)
 {
+    @*
     <Upload
         Name="files"
         Drag
@@ -24,7 +25,7 @@
             Support for a single or bulk upload. Strictly prohibit from uploading company data or other
             band files
         </p>
-    </Upload>
+    </Upload>*@
     <InputFile OnChange="OnInputFileChange" disabled="@_uploading" />
     <hr />
     <AntDesign.Progress Type="ProgressType.Circle" Percent=percent Status="ProgressStatus.Active" StrokeColor=_gradients />
@@ -56,7 +57,7 @@ else {
     bool _uploading { get; set; } = false;
     string echo = "";
     private long percent;
-
+    private List<IBrowserFile> Files { get; set; } = new List<IBrowserFile>();
     private string location = string.Empty;
     public bool intercepted = false;
 
