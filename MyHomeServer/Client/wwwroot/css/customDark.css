@@ -1,3 +1,6 @@
 ﻿span {
     color: white !important;
 }
+div * {
+    color: white !important;
+}
