@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MyHomeServer.Server.Data.DbModels;
-using MyHomeServer.ModelsLibrary.Models;
+using MyHomeServer.Shared.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -32,7 +32,7 @@ namespace MyHomeServer.Server.Controllers
             int counter = 0;
             foreach (var user in usersArray)
             {
-                users.Add(new UserDTO() { EmailAdress = user.Email, UserName = user.UserName });
+                users.Add(new UserDTO() { EmailAddress = user.Email, UserName = user.UserName });
             }
             
             return users;
@@ -42,9 +42,9 @@ namespace MyHomeServer.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] UserDTO user)
         {
-            string userName = user.UserName;
-            string password = user.Password;
-            string email = user.EmailAdress;
+            string userName = user.UserName!;
+            string password = user.Password!;
+            string email = user.EmailAddress!;
 
             ApplicationUser identityUser = new ApplicationUser()
             {
@@ -72,7 +72,7 @@ namespace MyHomeServer.Server.Controllers
         [Route("signin")]
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> SignIn([FromBody] UserDTO user)
+        public async Task<IActionResult> SignIn([FromBody] UserToSignIn user)
         {
             string userName = user.UserName;
             string password = user.Password;

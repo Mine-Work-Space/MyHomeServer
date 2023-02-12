@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
-using MyHomeServer.ModelsLibrary.Models;
+using MyHomeServer.Shared.Models;
 using Server.Data;
 
 namespace MyHomeServer.Server.Hubs

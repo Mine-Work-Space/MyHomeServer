@@ -27,8 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MyHomeServer.Client\MyHomeServer.Client.csproj" />
-    <ProjectReference Include="..\Shared\MyHomeServer.ModelsLibrary.csproj" />
+    <ProjectReference Include="..\Client\MyHomeServer.Client.csproj" />
+    <ProjectReference Include="..\Shared\MyHomeServer.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

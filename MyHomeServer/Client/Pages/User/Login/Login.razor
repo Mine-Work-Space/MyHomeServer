@@ -1,0 +1,25 @@
+﻿@namespace MyHomeServer.Client.Pages.User
+@layout UserLayout
+@page "/user/login"
+
+<div class="main__b__0">
+    <div class="login">
+        <h2>TestUser_123</h2>
+        <Form Model="@_userToSignIn" OnFinish="SignInUser">
+            <FormItem>
+                <AntDesign.Input Placeholder="Username" Size="large" @bind-Value="@_userToSignIn.UserName">
+                    <Prefix><Icon Type="user" /></Prefix>
+                </AntDesign.Input>
+            </FormItem>
+            <FormItem>
+                <AntDesign.Input Placeholder="Password" Size="large" @bind-Value="@_userToSignIn.Password" Type="password">
+                    <Prefix><Icon Type="lock" /></Prefix>
+                </AntDesign.Input>
+            </FormItem>
+            <Button Type="primary" HtmlType="submit" Class="submit" Size="large" OnClick="SignInUser" Block>Log in </Button>
+            <div class="other">
+                <a class="register" href="/user/register">Register Account</a>
+            </div>
+        </Form>
+    </div>
+</div>

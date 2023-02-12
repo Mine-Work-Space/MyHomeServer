@@ -1,0 +1,180 @@
+﻿@page "/chat"
+@using System.Security.Claims;
+@using Microsoft.AspNetCore.SignalR.Client;
+@using MyHomeServer.Client.Static;
+@inject NavigationManager NavigationManager
+@inject HttpClient _httpClient
+@implements IAsyncDisposable
+
+<PageTitle>Chat</PageTitle>
+@if (!IsAuthenticated)
+{
+    <p><em>Ви не авторизовані щоб почати користуватись чатом.</em></p>
+    <a href="/signin" class="btn btn-primary btn-lg">Увійти</a>
+}
+else
+{
+    <div class="clearfix" style="margin-top:-10px">
+    <div class="people-list" id="people-list">
+      <div class="search">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control border-dark text-black" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+        </div>
+      </div>
+      <ul class="list" style="margin-bottom:0px">
+          @foreach (var user in Users)
+            {
+                <li class="clearfix">
+                    <img src="images/defaultUser.png" class="user-photo" alt="avatar" />
+                    <div class="about">
+                        <div class="name">@user.UserName</div>
+                        <div class="status">
+                            <i class="fa fa-circle online"></i> online
+                        </div>
+                    </div>
+                </li>
+            }
+      </ul>
+    </div>
+    
+    <div class="chat">
+      <div class="chat-header clearfix">
+        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01_green.jpg" alt="avatar" />
+        
+        <div class="chat-about">
+          <div class="chat-with">Чат з Другом</div>
+          <div class="chat-num-messages">вже @Messages.Count смс</div>
+        </div>
+        <i class="fa fa-star"></i>
+      </div> <!-- end chat-header -->
+      
+      <div class="chat-history">
+        <ul>
+            @foreach (var message in Messages)
+            {
+                if(message.SenderUser == username)
+                {
+                    <!-- for current user -->
+                    <li class="clearfix">
+                        <div class="message-data align-right">
+                            <span class="message-data-time" >@message.SendDate</span> &nbsp; &nbsp;
+                            <span class="message-data-name" >@message.SenderUser</span> <i class="fa fa-circle me"></i>
+                        </div>
+                        <div class="message other-message float-right">
+                            @message.Content
+                        </div>
+                    </li>
+                }
+                else
+                {
+                    <!-- for another MyHomeServer.MyHomeServer.Client -->
+                    <li>
+                        <div class="message-data">
+                            <span class="message-data-name"><i class="fa fa-circle online"></i> @message.SenderUser</span>
+                            <span class="message-data-time">@message.SendDate</span>
+                        </div>
+                        <div class="message my-message">
+                            @message.Content
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+        
+      </div> <!-- end chat-history -->
+      
+      <div class="chat-message clearfix">
+        <textarea
+            name="message-to-send"
+            id="message-to-send"
+            placeholder="Напишіть повідомлення тут..."
+            rows="3" @bind-value="message"
+            @bind-value:event="oninput"
+            @onkeyup="HandleInput"
+            class="form-control"></textarea>
+
+        <i class="fa fa-file-o"></i>
+        <i class="fa fa-file-image-o"></i>
+        <button id="send-button" @onclick="Send" disabled="@(!IsConnected)">ВІДПРАВИТИ</button>
+      </div> <!-- end chat-message -->
+      
+      
+    </div> <!-- end chat -->
+  </div> <!-- end container -->
+}
+
+@code {
+    private HubConnection? hubConnection;
+    private bool IsAuthenticated = false;
+    private List<MessageDTO>? Messages = new List<MessageDTO>();
+    private List<UserDTO>? Users = new List<UserDTO>();
+    private string username = string.Empty;
+
+    private string message = string.Empty;
+
+    [CascadingParameter] protected Task<AuthenticationState> AuthenticationState { get; set; }
+    [Parameter] public EventCallback<string> ChildDataChanged { get; set; }
+    private async Task HandleOnChange(ChangeEventArgs args)
+    {
+        message = args.Value.ToString();
+        await ChildDataChanged.InvokeAsync(message);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var currentUser = (await AuthenticationState).User;
+        if (currentUser.Identity.IsAuthenticated == true)
+        {
+            // All okey and User is Authenticated
+            IsAuthenticated = true;
+            username = currentUser.Identity.Name;
+            Users = await _httpClient.GetFromJsonAsync<List<UserDTO>>(APIEndpoints.s_getUsers);
+            await Connect();
+        }
+    }
+    private async Task Connect()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri($"/chathub?username={username}"))
+            .Build();
+        hubConnection.On<MessageDTO>("GetMessage", (message) =>
+        {
+            MessageDTO msg = new MessageDTO()
+            {
+                Content = message.Content,
+                SendDate = message.SendDate,
+                SenderUser = message.SenderUser,
+                ChatId = message.ChatId
+            };
+            Messages.Add(msg);
+            StateHasChanged();
+        });
+        await hubConnection.StartAsync();
+    }
+    private async Task Send()
+    {
+        if (hubConnection != null && !String.IsNullOrWhiteSpace(message))
+        {
+            await hubConnection.SendAsync("AddMessageToChat", new MessageDTO()
+            { Content = message, SenderUser = username, SendDate = DateTime.Now });
+            message = string.Empty;
+            StateHasChanged();
+        }
+    }
+    public async Task HandleInput(KeyboardEventArgs args)
+    {
+        // Send message by enter button
+        if (args.Key.Equals("Enter"))
+        {
+            await Send();
+        }
+    }
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
