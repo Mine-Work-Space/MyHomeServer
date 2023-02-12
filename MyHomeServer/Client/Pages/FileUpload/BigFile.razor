@@ -28,11 +28,192 @@
     </Upload>*@
     <InputFile OnChange="OnInputFileChange" disabled="@_uploading" />
     <hr />
-    <AntDesign.Progress Type="ProgressType.Circle" Percent=percent Status="ProgressStatus.Active" StrokeColor=_gradients />
+    <AntDesign.Progress Type="ProgressType.Circle" Percent="50" Status="ProgressStatus.Active" StrokeColor=_gradients />
     <Button Class="stop-loading-button" Type="@ButtonType.Primary" Icon="@IconType.Outline.Pause" Size="@ButtonSize.Large"
         OnClick="PauseUploading">Призупинити завантаження</Button>
     <div>@echo</div>
+    <hr />
+    <div>
+        <Divider Orientation="left" Style="font-weight:bold">File 1</Divider>
+        <GridRow Justify="space-around" Align="middle" Wrap Type="flex">
+            <GridCol Span="7" Style="min-width:250px; display:contents">
+                <AntDesign.Progress Type="ProgressType.Circle" Percent="50" Status="ProgressStatus.Active" StrokeColor=_gradients Size="ProgressSize.Default" />
+            </GridCol>
+            <GridCol Span="10" Style="min-width:250px">
+                <Timeline Mode="TimelineMode.Left" Class="my-timeline" Style="max-height:300px; overflow-y: scroll; padding: 8px">
+                    <TimelineItem Label="2015-09-01 09:12:11">Create a services site </TimelineItem>
+                    <TimelineItem Color="red" Label="2015-09-01 09:12:20">Solve initial network problems</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:16:41">Technical testing</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                </Timeline>
+            </GridCol>
+            <GridCol Span="7" Style="min-width:250px; display:grid">
+                    <Button Class="stop-loading-button" Type="@ButtonType.Primary" Icon="@IconType.Outline.Pause" Size="@ButtonSize.Large"
+                        Style="margin-inline:16px"
+                        OnClick="PauseUploading">
+                        Призупинити
+                    </Button>
+            </GridCol>
+        </GridRow>
 
+        <Divider Orientation="left" Style="font-weight:bold">File 1</Divider>
+        <GridRow Justify="space-around" Align="middle" Wrap Type="flex">
+        <GridCol Span="7" Style="min-width:250px; display:contents">
+            <AntDesign.Progress Type="ProgressType.Circle" Percent="48" Status="ProgressStatus.Active" StrokeColor=_gradients Size="ProgressSize.Default" />
+        </GridCol>
+        <GridCol Span="10" Style="min-width:250px">
+            <Timeline Mode="TimelineMode.Left" Class="my-timeline" Style="max-height:300px; overflow-y: scroll; padding: 8px">
+                <TimelineItem Label="2015-09-01 09:12:11">Create a services site </TimelineItem>
+                <TimelineItem Color="red" Label="2015-09-01 09:12:20">Solve initial network problems</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:16:41">Technical testing</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+            </Timeline>
+        </GridCol>
+        <GridCol Span="7" Style="min-width:250px; display:grid">
+            <Button Class="stop-loading-button" Type="@ButtonType.Primary" Icon="@IconType.Outline.Pause" Size="@ButtonSize.Large"
+                    Style="margin-inline:16px"
+                    OnClick="PauseUploading">
+                Призупинити
+            </Button>
+        </GridCol>
+        </GridRow>
+
+        <Divider Orientation="left" Style="font-weight:bold">File 1</Divider>
+        <GridRow Justify="space-around" Align="middle" Wrap Type="flex">
+            <GridCol Span="7" Style="min-width:250px; display:contents">
+                <AntDesign.Progress Type="ProgressType.Circle" Percent="12" Status="ProgressStatus.Active" StrokeColor=_gradients Size="ProgressSize.Default" />
+            </GridCol>
+            <GridCol Span="10" Style="min-width:250px">
+                <Timeline Mode="TimelineMode.Left" Class="my-timeline" Style="max-height:300px; overflow-y: scroll; padding: 8px">
+                    <TimelineItem Label="2015-09-01 09:12:11">Create a services site </TimelineItem>
+                    <TimelineItem Color="red" Label="2015-09-01 09:12:20">Solve initial network problems</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:16:41">Technical testing</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                </Timeline>
+            </GridCol>
+            <GridCol Span="7" Style="min-width:250px; display:grid">
+                    <Button Class="stop-loading-button" Type="@ButtonType.Primary" Icon="@IconType.Outline.Pause" Size="@ButtonSize.Large"
+                        Style="margin-inline:16px"
+                        OnClick="PauseUploading">
+                        Призупинити
+                    </Button>
+            </GridCol>
+        </GridRow>
+
+        <Divider Orientation="left" Style="font-weight:bold">File 1</Divider>
+        <GridRow Justify="space-around" Align="middle" Wrap Type="flex">
+            <GridCol Span="7" Style="min-width:250px; display:contents">
+                <AntDesign.Progress Type="ProgressType.Circle" Percent="32" Status="ProgressStatus.Active" StrokeColor=_gradients Size="ProgressSize.Default" />
+            </GridCol>
+            <GridCol Span="10" Style="min-width:250px">
+                <Timeline Mode="TimelineMode.Left" Class="my-timeline" Style="max-height:300px; overflow-y: scroll; padding: 8px">
+                    <TimelineItem Label="2015-09-01 09:12:11">Create a services site </TimelineItem>
+                    <TimelineItem Color="red" Label="2015-09-01 09:12:20">Solve initial network problems</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:16:41">Technical testing</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                    <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                </Timeline>
+            </GridCol>
+            <GridCol Span="7" Style="min-width:250px; display:grid">
+                    <Button Class="stop-loading-button" Type="@ButtonType.Primary" Icon="@IconType.Outline.Pause" Size="@ButtonSize.Large"
+                        Style="margin-inline:16px"
+                        OnClick="PauseUploading">
+                        Призупинити
+                    </Button>
+            </GridCol>
+        </GridRow>
+
+        <Divider Orientation="left" Style="font-weight:bold">File 1</Divider>
+        <GridRow Justify="space-around" Align="middle" Wrap Type="flex">
+        <GridCol Span="7" Style="min-width:250px; display:contents">
+            <AntDesign.Progress Type="ProgressType.Circle" Percent="74" Status="ProgressStatus.Active" StrokeColor=_gradients Size="ProgressSize.Default" />
+        </GridCol>
+        <GridCol Span="10" Style="min-width:250px">
+            <Timeline Mode="TimelineMode.Left" Class="my-timeline" Style="max-height:300px; overflow-y: scroll; padding: 8px">
+                <TimelineItem Label="2015-09-01 09:12:11">Create a services site </TimelineItem>
+                <TimelineItem Color="red" Label="2015-09-01 09:12:20">Solve initial network problems</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:16:41">Technical testing</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+                <TimelineItem Label="2015-09-01 09:20:45">Network problems being solved</TimelineItem>
+            </Timeline>
+        </GridCol>
+        <GridCol Span="7" Style="min-width:250px; display:grid">
+            <Button Class="stop-loading-button" Type="@ButtonType.Primary" Icon="@IconType.Outline.Pause" Size="@ButtonSize.Large"
+                    Style="margin-inline:16px"
+                    OnClick="PauseUploading">
+                Призупинити
+            </Button>
+        </GridCol>
+        </GridRow>
+    </div>
 }
 else {
     <h1>Я не знаю хто ти такий.</h1>
@@ -40,6 +221,13 @@ else {
         <span class="oi oi-account-login" aria-hidden="true"></span> Увійти
     </NavLink>
 }
+<style>
+    @@media only screen and (max-width: 425px) {
+        .my-timeline {
+            width: fit-content;
+        }
+    }
+</style>
 
 <NavigationLock ConfirmExternalNavigation="true" OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
@@ -56,8 +244,11 @@ else {
 
     bool _uploading { get; set; } = false;
     string echo = "";
-    private long percent;
-    private List<IBrowserFile> Files { get; set; } = new List<IBrowserFile>();
+    private List<long> percentList = new List<long>();
+
+    private List<IBrowserFile> _filesToUpload = new List<IBrowserFile>();
+    List<UploadFileItem> fileList = new List<UploadFileItem>();
+
     private string location = string.Empty;
     public bool intercepted = false;
 
@@ -112,47 +303,58 @@ else {
             fileinfo.File.Url = result.Url;
         }
     }
-    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    private void OnInputFileChange(InputFileChangeEventArgs e)
     {
-        const long CHUNKSIZE = 1024 * 400; // subjective
-
-        var file = e.File;
-        long uploadedBytes = 0;
-        long totalBytes = file.Size;
-        int fragment = 0;
-        long chunkSize;
-        using (var inStream = file.OpenReadStream(long.MaxValue))
+        _filesToUpload.Add(e.File);
+    }
+    private async Task UploadFiles()
+    {
+        if (_filesToUpload.Count > 0)
         {
-            _uploading = true;
-            await JSRuntime.InvokeVoidAsync("ShowStopLoadingButton");
-            while (_uploading)
+            foreach (var f in _filesToUpload)
             {
-                chunkSize = CHUNKSIZE;
-                if (uploadedBytes + CHUNKSIZE > totalBytes)
-                {// remainder
-                    chunkSize = totalBytes - uploadedBytes;
+                const long CHUNKSIZE = 1024 * 400; // subjective
+
+                var file = f;
+                long uploadedBytes = 0;
+                long totalBytes = file.Size;
+                int fragment = 0;
+                long chunkSize;
+                using (var inStream = file.OpenReadStream(long.MaxValue))
+                {
+                    _uploading = true;
+                    await JSRuntime.InvokeVoidAsync("ShowStopLoadingButton");
+                    while (_uploading)
+                    {
+                        chunkSize = CHUNKSIZE;
+                        if (uploadedBytes + CHUNKSIZE > totalBytes)
+                        {// remainder
+                            chunkSize = totalBytes - uploadedBytes;
+                        }
+                        var chunk = new byte[chunkSize];
+                        await inStream.ReadAsync(chunk, 0, chunk.Length);
+                        // upload this fragment
+                        using var formFile = new MultipartFormDataContent();
+                        var fileContent = new StreamContent(new MemoryStream(chunk));
+                        formFile.Add(fileContent, "file", file.Name);
+                        // post
+                        var response = await _httpClient.PostAsync($"api/File/AppendFile/{fragment++}", formFile);
+                        // Update our progress data and UI
+                        uploadedBytes += chunkSize;
+                        //percent = uploadedBytes * 100 / totalBytes;
+                        //echo = $"Завантажено {percent}%  {uploadedBytes} із {totalBytes} | Фрагмент: {fragment}";
+                        //if (percent >= 100)
+                        //{// upload complete
+                            _uploading = false;
+                        //}
+                        await InvokeAsync(StateHasChanged);
+                    }
+                    //if (percent >= 100)
+                    //{
+                        await JSRuntime.InvokeVoidAsync("HideStopLoadingButton");
+                        await Swal.FireAsync("Ура!", "Файл успішно завантажений", "success");
+                    //}
                 }
-                var chunk = new byte[chunkSize];
-                await inStream.ReadAsync(chunk, 0, chunk.Length);
-                // upload this fragment
-                using var formFile = new MultipartFormDataContent();
-                var fileContent = new StreamContent(new MemoryStream(chunk));
-                formFile.Add(fileContent, "file", file.Name);
-                // post
-                var response = await _httpClient.PostAsync($"api/File/AppendFile/{fragment++}", formFile);
-                // Update our progress data and UI
-                uploadedBytes += chunkSize;
-                percent = uploadedBytes * 100 / totalBytes;
-                echo = $"Завантажено {percent}%  {uploadedBytes} із {totalBytes} | Фрагмент: {fragment}";
-                if (percent >= 100)
-                {// upload complete
-                    _uploading = false;
-                }
-                await InvokeAsync(StateHasChanged);
-            }
-            if(percent >= 100) {
-                await JSRuntime.InvokeVoidAsync("HideStopLoadingButton");
-                await Swal.FireAsync("Ура!", "Файл успішно завантажений", "success");
             }
         }
     }
