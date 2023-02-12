@@ -1,0 +1,158 @@
+﻿@page "/upload-big-file"
+@using System.Net.Http.Headers
+@using System.IO
+@using AntDesign.Charts
+
+@inject HttpClient _httpClient
+@inject SweetAlertService Swal
+@inject IJSRuntime JSRuntime
+
+<h1>Завантаження великого файлу</h1>
+<hr />
+@if (isAuthenticated)
+{
+    <Upload
+        Name="files"
+        Drag
+        Multiple
+        OnSingleCompleted="OnSingleCompleted">
+        <p class="ant-upload-drag-icon">
+            <Icon Type="inbox" />
+        </p>
+        <p class="ant-upload-text">Натисни</p>
+        <p class="ant-upload-hint">
+            Support for a single or bulk upload. Strictly prohibit from uploading company data or other
+            band files
+        </p>
+    </Upload>
+    <InputFile OnChange="OnInputFileChange" disabled="@_uploading" />
+    <hr />
+    <AntDesign.Progress Type="ProgressType.Circle" Percent=percent Status="ProgressStatus.Active" StrokeColor=_gradients />
+    <Button Class="stop-loading-button" Type="@ButtonType.Primary" Icon="@IconType.Outline.Pause" Size="@ButtonSize.Large"
+        OnClick="PauseUploading">Призупинити завантаження</Button>
+    <div>@echo</div>
+
+}
+else {
+    <h1>Я не знаю хто ти такий.</h1>
+    <NavLink class="nav-link" href="signin">
+        <span class="oi oi-account-login" aria-hidden="true"></span> Увійти
+    </NavLink>
+}
+
+<NavigationLock ConfirmExternalNavigation="true" OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+
+@code {
+
+    [CascadingParameter] protected Task<AuthenticationState> AuthenticationState { get; set; }
+    bool isAuthenticated { get; set; }
+    private bool _isVisible { get; set; } = false;
+    private Dictionary<string, string> _gradients = new()
+    {
+        { "0%", "#77A1D3" },
+        { "100%", "#E684AE" }
+    };
+
+    bool _uploading { get; set; } = false;
+    string echo = "";
+    private long percent;
+
+    private string location = string.Empty;
+    public bool intercepted = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationState).User;
+        if (user.Identity.IsAuthenticated == true)
+        {
+            isAuthenticated = true;
+            // Hide button
+            await JSRuntime.InvokeVoidAsync("HideStopLoadingButton");
+        }
+    }
+    private async void PauseUploading()
+    {
+        // TO DO
+        if (_uploading)
+        {
+            _uploading = false;
+            await Swal.FireAsync("!" + _uploading.ToString());
+        }
+        else
+        {
+            _uploading = true;
+        }
+    }
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if(_uploading)
+        {
+            var isConfirmed = await Swal.FireAsync(new SweetAlertOptions()
+            {
+                Title = "Увага!",
+                Text = "Завантаження файлу, можливо, буде припинено. Продовжити?",
+                Icon = "warning",
+                ShowCancelButton = true
+            }); //  JSRuntime.InvokeAsync<bool>("confirm", "Ви впевнені що хочете залишити сторінку?");
+
+            location = context.TargetLocation;
+            intercepted = context.IsNavigationIntercepted;
+            if(!isConfirmed.IsConfirmed)
+            {
+                context.PreventNavigation();
+            }
+        }
+    }
+    private void OnSingleCompleted(UploadInfo fileinfo)
+    {
+        if (fileinfo.File.State == UploadState.Success)
+        {
+            var result = fileinfo.File.GetResponse<ResponseModel>();
+            fileinfo.File.Url = result.Url;
+        }
+    }
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        const long CHUNKSIZE = 1024 * 400; // subjective
+
+        var file = e.File;
+        long uploadedBytes = 0;
+        long totalBytes = file.Size;
+        int fragment = 0;
+        long chunkSize;
+        using (var inStream = file.OpenReadStream(long.MaxValue))
+        {
+            _uploading = true;
+            await JSRuntime.InvokeVoidAsync("ShowStopLoadingButton");
+            while (_uploading)
+            {
+                chunkSize = CHUNKSIZE;
+                if (uploadedBytes + CHUNKSIZE > totalBytes)
+                {// remainder
+                    chunkSize = totalBytes - uploadedBytes;
+                }
+                var chunk = new byte[chunkSize];
+                await inStream.ReadAsync(chunk, 0, chunk.Length);
+                // upload this fragment
+                using var formFile = new MultipartFormDataContent();
+                var fileContent = new StreamContent(new MemoryStream(chunk));
+                formFile.Add(fileContent, "file", file.Name);
+                // post
+                var response = await _httpClient.PostAsync($"api/File/AppendFile/{fragment++}", formFile);
+                // Update our progress data and UI
+                uploadedBytes += chunkSize;
+                percent = uploadedBytes * 100 / totalBytes;
+                echo = $"Завантажено {percent}%  {uploadedBytes} із {totalBytes} | Фрагмент: {fragment}";
+                if (percent >= 100)
+                {// upload complete
+                    _uploading = false;
+                }
+                await InvokeAsync(StateHasChanged);
+            }
+            if(percent >= 100) {
+                await JSRuntime.InvokeVoidAsync("HideStopLoadingButton");
+                await Swal.FireAsync("Ура!", "Файл успішно завантажений", "success");
+            }
+        }
+    }
+}

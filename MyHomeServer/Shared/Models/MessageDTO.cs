@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyHomeServer.ModelsLibrary.Models
+namespace MyHomeServer.Shared.Models
 {
     public class MessageDTO
     {

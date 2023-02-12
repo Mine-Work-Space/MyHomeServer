@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MyHomeServer.ModelsLibrary.Models;
+using MyHomeServer.Shared.Models;
 
 namespace MyHomeServer.Server.Controllers
 {
