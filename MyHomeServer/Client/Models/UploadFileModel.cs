@@ -9,7 +9,6 @@ namespace MyHomeServer.Client.Models
     {
         public IBrowserFile File { get; set; }
         public double UploadPercent { get; set; } = 0;
-        public string NormalizedName { get; set; } = String.Empty;
         public List<(DateTime, string)> Logs { get; set; } = new List<(DateTime, string)>();
         public ProgressStatus ProgressStatus { get; set; } = ProgressStatus.Active;
         public Dictionary<string, string> ProgressStrokeColor { get; set; } = new Dictionary<string, string>();
