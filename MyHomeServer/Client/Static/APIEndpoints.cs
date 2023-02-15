@@ -5,7 +5,7 @@
 #if DEBUG
         internal const string ServerBaseUrl = "https://localhost:5003"; //https://localhost:5003
 #else
-        internal const string ServerBaseUrl = "http://84.136.203.248";
+        internal const string ServerBaseUrl = "http://84.186.86.242";
 #endif
         internal readonly static string s_register = $"{ServerBaseUrl}/api/user/register";
         internal readonly static string s_signIn = $"{ServerBaseUrl}/api/user/signin";

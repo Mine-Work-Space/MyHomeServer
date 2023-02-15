@@ -1,6 +1,8 @@
-function ShowStopLoadingButton() {
-    $(".stop-loading-button").show();
+function ShowButton(fileNameButton) {
+    console.log('.' + fileNameButton + " show!");
+    $('.' + fileNameButton).show();
 } 
-function HideStopLoadingButton() {
-    $(".stop-loading-button").hide();
+function HideButton(fileNameButton) {
+    console.log('.' + fileNameButton + " hide!");
+    $('.' + fileNameButton).hide();
 } 

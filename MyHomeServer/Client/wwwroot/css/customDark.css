@@ -4,3 +4,6 @@
 div * {
     color: white !important;
 }
+.ant-dropdown-menu {
+    background: #1f1f1f !important;
+}
