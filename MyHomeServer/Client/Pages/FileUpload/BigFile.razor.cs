@@ -45,21 +45,14 @@ namespace MyHomeServer.Client.Pages.FileUpload
         }
         private async Task<bool> SelectedFileRemoved(UploadFileItem fileItem)
         {
-            try
-            {
-                _customUploadFileModels.RemoveAll(file => String.Equals(file.File.Name, fileItem.FileName));
-                StateHasChanged();
-            }
-            catch (System.Exception err)
-            {
-                return false;
-            }
+            _customUploadFileModels.RemoveAll(file => String.Equals(file.File.Name, fileItem.FileName));
+            await InvokeAsync(StateHasChanged);
             return true;
         }
         // If files uploading & user wants to navigate on another page
         private async Task OnBeforeInternalNavigation(LocationChangingContext context)
         {
-            if (_uploaded)
+            if (!_uploaded)
             {
                 var isConfirmed = await Swal.FireAsync(new SweetAlertOptions()
                 {
@@ -71,8 +64,6 @@ namespace MyHomeServer.Client.Pages.FileUpload
 
                 string location = context.TargetLocation;
                 intercepted = context.IsNavigationIntercepted;
-                await Swal.FireAsync(location);
-                await Swal.FireAsync(intercepted.ToString());
                 if (!isConfirmed.IsConfirmed)
                 {
                     context.PreventNavigation();
