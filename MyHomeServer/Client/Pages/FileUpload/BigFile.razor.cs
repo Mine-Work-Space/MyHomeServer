@@ -12,22 +12,6 @@ namespace MyHomeServer.Client.Pages.FileUpload
 {
     public partial class BigFile
     {
-        // Colors for progress bar
-        private Dictionary<string, string> _gradientColor = new()
-        {
-            { "0%", "#77A1D3" },
-            { "100%", "#E684AE" }
-        };
-        private Dictionary<string, string> _successColor = new()
-        {
-            { "0%", "#52c41a" },
-            { "100%", "#52c41a" }
-        };
-        private Dictionary<string, string> _failColor = new()
-        {
-            { "0%", "#ff4d4f" },
-            { "100%", "#ff4d4f" }
-        };
         [CascadingParameter] protected Task<AuthenticationState> AuthenticationState { get; set; }
         bool isAuthenticated { get; set; }
         protected override async Task OnInitializedAsync()

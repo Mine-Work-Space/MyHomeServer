@@ -9,7 +9,7 @@
 @inject HttpClient _httpClient
 @inject SweetAlertService Swal
 @inject IJSRuntime JSRuntime
-@inject IMessageService Message
+
 <Space>
     <SpaceItem>
         <h1>Завантаження файлів</h1>
@@ -84,12 +84,16 @@ else {
 </style>
 
 @code {
+    // Colors for progress bar
+    private Dictionary<string, string> _gradientColor = new() { { "0%", "#77A1D3" }, { "100%", "#E684AE" } };
+    private Dictionary<string, string> _successColor = new() { { "0%", "#52c41a" }, { "100%", "#52c41a" } };
+    private Dictionary<string, string> _failColor = new() { { "0%", "#ff4d4f" }, { "100%", "#ff4d4f" } };
+    //
     private const long CHUNKSIZE = 1024 * 1000;
-
     private bool _canUploading { get; set; } = false;
     // For all files in pool
-    bool _uploaded { get; set; } = false;
-    public bool intercepted = false;
+    private bool _uploaded { get; set; } = false;
+    private bool intercepted = false;
     private string pauseButtonText { get; set; } = "Призупинити завантаження";
     // Ant Design, for deleting or adding files before uploading
     private List<UploadFileItem> _filesPinnedDisplayingList = new List<UploadFileItem>();
@@ -97,10 +101,11 @@ else {
     private List<CustomUploadFileModel> _customUploadFileModels = new List<CustomUploadFileModel>();
     // 
     private Task _uploadingTask;
+    PauseTokenSource pts = new PauseTokenSource();
 
     private async Task PauseUploading()
     {
-        if (_uploading && _uploadingTask != null && (await pts.IsPaused()) == false)
+        if (_uploadingTask != null && (await pts.IsPaused()) == false)
         {
             pauseButtonText = "Продовжити завантаження";
             await pts.PauseAsync();
@@ -122,24 +127,22 @@ else {
             _customUploadFileModels.Add(new CustomUploadFileModel() { File = file });
 
         _filesPinnedDisplayingList = _customUploadFileModels.Select(file => new UploadFileItem
-            {
-                FileName = file.File.Name,
-                Size = file.File.Size,
-                State = UploadState.Fail
-            }).ToList();
-
+        {
+            FileName = file.File.Name,
+            Size = file.File.Size,
+            State = UploadState.Fail
+        }).ToList();
         _canUploading = _filesPinnedDisplayingList.Count > 0 ? true : false;
-
         await InvokeAsync(StateHasChanged);
     }
+    // Uploading files logic (used Task and custom Pause token for pausing task)
     private void StartUploadingFiles()
     {
         Upload(CancellationToken.None);
     }
-    bool _uploading = false;
     private async Task UploadingFilesAsync(PauseToken pause, CancellationToken token)
     {
-        _uploading = true;
+        _canUploading = false;
         bool success = false;
         foreach (var customFileModel in _customUploadFileModels)
         {
@@ -244,32 +247,8 @@ else {
             await JSRuntime.InvokeVoidAsync("HideStopLoadingButton");
             await Swal.FireAsync("Ура!", result, "success");
         }
-        _uploading = false;
+        _canUploading = true;
     }
-    PauseTokenSource pts = new PauseTokenSource();
-
-    public async Task DoWorkAsync(PauseToken pause, CancellationToken token)
-    {
-        try
-        {
-            while (true)
-            {
-                token.ThrowIfCancellationRequested();
-
-                Console.WriteLine("Before await pause.PauseIfRequestedAsync()");
-                await pause.PauseIfRequestedAsync();
-                Console.WriteLine("After await pause.PauseIfRequestedAsync()");
-
-                await Task.Delay(1000);
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Exception: {0}", e);
-            throw;
-        }
-    }
-
     private void Upload(CancellationToken token)
     {
         _uploadingTask = UploadingFilesAsync(pts.Token, token);
