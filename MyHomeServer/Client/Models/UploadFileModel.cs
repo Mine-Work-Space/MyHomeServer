@@ -10,6 +10,7 @@ namespace MyHomeServer.Client.Models
     {
         public IBrowserFile File { get; set; }
         public float UploadedPercent { get; set; } = 0.0f;
+        public float OldPercent { get; set; } = 0.0f;
         public int Fragment { get; set; } = 0;
         public long UploadedBytes { get; set; } = 0;
         public long TotalBytes { get; set; } = 0;

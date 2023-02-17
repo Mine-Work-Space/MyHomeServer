@@ -3,11 +3,13 @@
 @using System.IO
 @using AntDesign.Charts
 @using MyHomeServer.Client.Models;
+@using MyHomeServer.Client.ThreadsManager;
+@using System.Threading;
 
 @inject HttpClient _httpClient
 @inject SweetAlertService Swal
 @inject IJSRuntime JSRuntime
-
+@inject IMessageService Message
 <Space>
     <SpaceItem>
         <h1>Завантаження файлів</h1>
@@ -88,26 +90,25 @@ else {
     // For all files in pool
     bool _uploaded { get; set; } = false;
     public bool intercepted = false;
-    private bool _pauseUploading { get; set; } = false; // For Stop Uploading Button
-    private string pauseButtonText { get; set; } = "Призупинити";
+    private string pauseButtonText { get; set; } = "Призупинити завантаження";
     // Ant Design, for deleting or adding files before uploading
     private List<UploadFileItem> _filesPinnedDisplayingList = new List<UploadFileItem>();
     // For displaying progress and status of uploading
     private List<CustomUploadFileModel> _customUploadFileModels = new List<CustomUploadFileModel>();
+    // 
+    private Task _uploadingTask;
 
     private async Task PauseUploading()
     {
-        // TO DO
-        if (_pauseUploading)
+        if (_uploading && _uploadingTask != null && (await pts.IsPaused()) == false)
         {
-            _pauseUploading = false;
-            await Swal.FireAsync("!false -> " + _pauseUploading.ToString());
+            pauseButtonText = "Продовжити завантаження";
+            await pts.PauseAsync();
         }
         else
         {
-            _pauseUploading = true;
-            pauseButtonText = "Продовжити завантаження";
-            await Swal.FireAsync("!?true -> " + _pauseUploading.ToString());
+            pauseButtonText = "Призупинити завантаження";
+            await pts.ResumeAsync();
         }
     }
     private async void OnInputFileChange(InputFileChangeEventArgs e)
@@ -131,34 +132,40 @@ else {
 
         await InvokeAsync(StateHasChanged);
     }
-    private async Task StartUploadingFiles()
+    private void StartUploadingFiles()
     {
-        List<float> percents = new List<float>();
+        Upload(CancellationToken.None);
+    }
+    bool _uploading = false;
+    private async Task UploadingFilesAsync(PauseToken pause, CancellationToken token)
+    {
+        _uploading = true;
         bool success = false;
         foreach (var customFileModel in _customUploadFileModels)
         {
             if (customFileModel.ProgressStatus != ProgressStatus.Success)
             {
-                try
+                var file = customFileModel.File;
+                customFileModel.TotalBytes = file.Size;
+
+                _filesPinnedDisplayingList.Where(f => f.FileName == customFileModel.File.Name).First().State = UploadState.Uploading;
+                customFileModel.ProgressStatus = ProgressStatus.Active;
+                customFileModel.ProgressStrokeColor = _gradientColor;
+                customFileModel.Logs.Add((DateTime.Now, "Почалось завантаження"));
+                customFileModel.IsUploading = true;
+                customFileModel.Pending = @<TimelineItem>Йде завантаження...</TimelineItem>;
+
+                await JSRuntime.InvokeVoidAsync("ShowStopLoadingButton");
+                using (var inStream = file.OpenReadStream(long.MaxValue))
                 {
-                    var file = customFileModel.File;
-                    customFileModel.UploadedBytes = 0;
-                    customFileModel.TotalBytes = file.Size;
-
-                    percents.Clear();
-                    _filesPinnedDisplayingList.Where(f => f.FileName == customFileModel.File.Name).First().State = UploadState.Uploading;
-                    customFileModel.ProgressStatus = ProgressStatus.Active;
-                    customFileModel.ProgressStrokeColor = _gradientColor;
-                    customFileModel.Logs.Add((DateTime.Now, "Почалось завантаження"));
-                    customFileModel.IsUploading = true;
-                    customFileModel.Pending = @<TimelineItem>Йде завантаження...</TimelineItem>;
-
-                    await JSRuntime.InvokeVoidAsync("ShowStopLoadingButton");
-                    float oldPercent = 0;
-                    using (var inStream = file.OpenReadStream(long.MaxValue))
+                    try
                     {
-                        while (customFileModel.IsUploading && _pauseUploading == false)
+                        while (customFileModel.IsUploading)
                         {
+                            // 
+                            token.ThrowIfCancellationRequested();
+                            await pause.PauseIfRequestedAsync();
+
                             customFileModel.ChunkSize = CHUNKSIZE;
                             if (customFileModel.UploadedBytes + CHUNKSIZE > customFileModel.TotalBytes)
                             {
@@ -166,15 +173,17 @@ else {
                             }
                             var chunk = new byte[customFileModel.ChunkSize];
                             await inStream.ReadAsync(chunk, 0, chunk.Length);
-                            // upload this fragment
-                            using var formFile = new MultipartFormDataContent();
-                            var fileContent = new StreamContent(new MemoryStream(chunk));
-                            formFile.Add(fileContent, "file", file.Name);
-                            // post
-                            var response = await _httpClient.PostAsync($"api/File/AppendFile/{customFileModel.Fragment++}", formFile);
+                            // Upload this fragment
+                            using (var formFile = new MultipartFormDataContent())
+                            {
+                                var fileContent = new StreamContent(new MemoryStream(chunk));
+                                formFile.Add(fileContent, "file", file.Name);
+                                // Post
+                                var response = await _httpClient.PostAsync($"api/File/AppendFile/{customFileModel.Fragment++}", formFile);
+                            }
                             // Update our progress data and UI
                             customFileModel.UploadedBytes += customFileModel.ChunkSize;
-                            oldPercent = customFileModel.UploadedPercent;
+                            customFileModel.OldPercent = customFileModel.UploadedPercent;
                             customFileModel.UploadedPercent = customFileModel.UploadedBytes * 100 / customFileModel.TotalBytes;
 
                             // Uploading of the current file ended
@@ -183,48 +192,51 @@ else {
                                 customFileModel.IsUploading = false;
                                 customFileModel.ProgressStatus = ProgressStatus.Success;
                                 var uploadingTime = DateTime.Now - customFileModel.Logs[0].Item1;
+                                customFileModel.Logs.Add((DateTime.Now, $"Завантажено {customFileModel.UploadedPercent}%"));
                                 customFileModel.Logs.Add((DateTime.Now, $"Завантаження закінчилось і тривало {uploadingTime.Minutes} хв {uploadingTime.Seconds} сек"));
+                                await JSRuntime.InvokeVoidAsync("ScrollToLastLog");
                                 customFileModel.ProgressStrokeColor = _successColor;
                                 customFileModel.Pending = null;
                                 _filesPinnedDisplayingList.Where(f => f.FileName == customFileModel.File.Name).First().State = UploadState.Success;
                             }
-                            if (customFileModel.UploadedPercent % 5 == 0)
+                            if (customFileModel.OldPercent != customFileModel.UploadedPercent)
                             {
-                                //customFileModel.Logs.Add((DateTime.Now, $"Завантажено {customFileModel.UploadedPercent}%"));
+                                if(customFileModel.UploadedPercent % 10 == 0 && customFileModel.UploadedPercent != 100)
+                                {
+                                    customFileModel.Logs.Add((DateTime.Now, $"Завантажено {customFileModel.UploadedPercent}%"));
+                                    await JSRuntime.InvokeVoidAsync("ScrollToLastLog");
+                                }
                                 await InvokeAsync(StateHasChanged);
                             }
                         }
                     }
-                }
-                catch (Exception err)
-                {
-                    customFileModel.Logs.Add((DateTime.Now, $"Помилка - {err.Message}."));
-                    customFileModel.ProgressStatus = ProgressStatus.Exception;
-                    customFileModel.ProgressStrokeColor = _failColor;
-                    _filesPinnedDisplayingList.Where(f => f.FileName == customFileModel.File.Name).First().State = UploadState.Fail;
-                    success = false;
-                    await Swal.FireAsync("Опана", $"Фрагмент файлу: {customFileModel.Fragment}", "error");
-                    var isConfirmed = await Swal.FireAsync(new SweetAlertOptions()
+                    catch (Exception err)
                     {
-                        Title = "Опана!",
-                        Text = "Сервер не відповідає. Можливо проблеми з інтернетом. Спробувати продовжити завантаження?",
-                        Icon = "warning",
-                        ShowCancelButton = true
-                    });
-                    if (isConfirmed.IsConfirmed)
-                    {
-                        await StartUploadingFiles();
+                        customFileModel.Logs.Add((DateTime.Now, $"Помилка - {err.Message}."));
+                        await JSRuntime.InvokeVoidAsync("ScrollToLastLog");
+                        await Swal.FireAsync(new SweetAlertOptions()
+                        {
+                            Title = "Опана!",
+                            Text = "Сервер не відповідає. Можливо проблеми з інтернетом. Прийдеться завантажувати знову..",
+                            Icon = "error",
+                        });
+                        customFileModel.ProgressStatus = ProgressStatus.Exception;
+                        customFileModel.ProgressStrokeColor = _failColor;
+                        customFileModel.Pending = null;
+                        _filesPinnedDisplayingList.Where(f => f.FileName == customFileModel.File.Name).First().State = UploadState.Fail;
+                        success = false;
+                        await JSRuntime.InvokeVoidAsync("HideStopLoadingButton");
+                        await InvokeAsync(StateHasChanged);
+                        await pts.PauseAsync();
+                        break;
                     }
-                    break;
-
                 }
             }
             success = true;
         }
-        if (!_pauseUploading && success)
+        if (success)
         {
             _uploaded = true;
-
             string result = "";
             if (_customUploadFileModels.Count == 1) result = "1 файл успішно завантажений";
             else if (_customUploadFileModels.Count >= 2 && _customUploadFileModels.Count < 4) result = $"{_customUploadFileModels.Count} файли успішно завантажені";
@@ -232,5 +244,34 @@ else {
             await JSRuntime.InvokeVoidAsync("HideStopLoadingButton");
             await Swal.FireAsync("Ура!", result, "success");
         }
+        _uploading = false;
+    }
+    PauseTokenSource pts = new PauseTokenSource();
+
+    public async Task DoWorkAsync(PauseToken pause, CancellationToken token)
+    {
+        try
+        {
+            while (true)
+            {
+                token.ThrowIfCancellationRequested();
+
+                Console.WriteLine("Before await pause.PauseIfRequestedAsync()");
+                await pause.PauseIfRequestedAsync();
+                Console.WriteLine("After await pause.PauseIfRequestedAsync()");
+
+                await Task.Delay(1000);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Exception: {0}", e);
+            throw;
+        }
+    }
+
+    private void Upload(CancellationToken token)
+    {
+        _uploadingTask = UploadingFilesAsync(pts.Token, token);
     }
 }
