@@ -33,8 +33,7 @@ namespace MyHomeServer.Client.Pages.User
             }
             else
             {
-                string serverErrorMessages = await httpResponseMessage.Content.ReadAsStringAsync();
-                _attemptToRegisterFailedErrorMessage = $"{serverErrorMessages} Change data and try again.";
+                _attemptToRegisterFailedErrorMessage = $"Change data and try again.";
                 await Swal.FireAsync($"{_attemptToRegisterFailedErrorMessage}");
                 _attemptToRegisterFailed = true;
             }
