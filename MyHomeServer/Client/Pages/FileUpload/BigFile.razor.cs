@@ -36,7 +36,7 @@ namespace MyHomeServer.Client.Pages.FileUpload
         // If files uploading & user wants to navigate on another page
         private async Task OnBeforeInternalNavigation(LocationChangingContext context)
         {
-            if (!_uploaded)
+            if (!_canUploading)
             {
                 var isConfirmed = await Swal.FireAsync(new SweetAlertOptions()
                 {

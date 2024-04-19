@@ -1,11 +1,15 @@
-﻿namespace MyHomeServer.Client.Static
+﻿using System;
+using System.Net;
+using System.Net.Sockets;
+
+namespace MyHomeServer.Client.Static
 {
     public static class APIEndpoints
     {
 #if DEBUG
-        internal const string ServerBaseUrl = "https://localhost:5003"; //https://localhost:5003
+        internal static readonly string ServerBaseUrl = "https://192.168.1.109:5003"; //https://localhost:5003
 #else
-        internal const string ServerBaseUrl = "http://84.186.86.242";
+        internal static readonly string ServerBaseUrl = "https://192.168.1.109:5003";
 #endif
         internal readonly static string s_register = $"{ServerBaseUrl}/api/user/register";
         internal readonly static string s_signIn = $"{ServerBaseUrl}/api/user/signin";

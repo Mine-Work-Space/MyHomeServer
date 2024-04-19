@@ -70,7 +70,7 @@
 }
 else {
     <h1>Я не знаю хто ти такий.</h1>
-    <NavLink class="nav-link" href="signin">
+    <NavLink class="nav-link" href="/user/login">
         <span class="oi oi-account-login" aria-hidden="true"></span> Увійти
     </NavLink>
 }
@@ -143,6 +143,7 @@ else {
     private async Task UploadingFilesAsync(PauseToken pause, CancellationToken token)
     {
         _canUploading = false;
+        _uploaded = false;
         bool success = false;
         foreach (var customFileModel in _customUploadFileModels)
         {

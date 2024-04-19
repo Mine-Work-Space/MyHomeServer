@@ -42,6 +42,7 @@ namespace MyHomeServer.Client.Pages.User
             else
             {
                 _attemptToSignInFailed = true;
+                await Swal.FireAsync($"Opps, no users founded!");
             }
         }
     }

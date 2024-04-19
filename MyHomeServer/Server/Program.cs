@@ -6,15 +6,14 @@ using Microsoft.IdentityModel.Tokens;
 using MyHomeServer.Server.Data.DbModels;
 using MyHomeServer.Server.Hubs;
 using Server.Data;
+using System.Net;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-
 
 builder.Services.AddCors(options =>
 {
@@ -53,7 +52,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(
     options => options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat( new[] { "application/octet-stream" }));
-
 var app = builder.Build();
 // SignalR Docs, not necessary
 app.UseResponseCompression();
@@ -73,6 +71,7 @@ else
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+
 }
 // For updating css or javascript
 app.UseStaticFiles(new StaticFileOptions()
